@@ -5,7 +5,7 @@ import Files
 import Foundation
 
 public enum NnConfigGen {
-    public func saveConfig<Config: NnConfig>(_ config: Config) throws {
+    public static func saveConfig<Config: NnConfig>(_ config: Config) throws {
         let configFilePath = ConfigPathFactory.makeConfigFilePath(projectName: config.projectName)
         let configFile = try Folder.home.createFileIfNeeded(at: configFilePath)
         let encoder = JSONEncoder.prettyOutput()
@@ -14,7 +14,7 @@ public enum NnConfigGen {
         try configFile.write(configData)
     }
     
-    public func loadConfig<Config: NnConfig>(projectName: String) throws -> Config {
+    public static func loadConfig<Config: NnConfig>(projectName: String) throws -> Config {
         let configFilePath = ConfigPathFactory.makeConfigFilePath(projectName: projectName, withHomeDirectory: true)
         let configFile = try File(path: configFilePath)
         let data = try configFile.read()
