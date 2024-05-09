@@ -6,7 +6,7 @@ import Foundation
 
 public enum NnConfigGen {
     public static func saveConfig<Config: NnConfig>(_ config: Config) throws {
-        let configFilePath = ConfigPathFactory.makeConfigFilePath(projectName: config.projectName)
+        let configFilePath = ConfigPathFactory.makeConfigFilePath(projectName: Config.projectName)
         let configFile = try Folder.home.createFileIfNeeded(at: configFilePath)
         let encoder = JSONEncoder.prettyOutput()
         let configData = try encoder.encode(config)
@@ -14,8 +14,8 @@ public enum NnConfigGen {
         try configFile.write(configData)
     }
     
-    public static func loadConfig<Config: NnConfig>(projectName: String) throws -> Config {
-        let configFilePath = ConfigPathFactory.makeConfigFilePath(projectName: projectName, withHomeDirectory: true)
+    public static func loadConfig<Config: NnConfig>() throws -> Config {
+        let configFilePath = ConfigPathFactory.makeConfigFilePath(projectName: Config.projectName, withHomeDirectory: true)
         let configFile = try File(path: configFilePath)
         let data = try configFile.read()
         let decoder = JSONDecoder()
@@ -27,7 +27,7 @@ public enum NnConfigGen {
 
 // MARK: - Dependencies
 public protocol NnConfig: Codable {
-    var projectName: String { get }
+    static var projectName: String { get }
 }
 
 
