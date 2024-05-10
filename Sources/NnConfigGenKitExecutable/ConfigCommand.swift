@@ -24,7 +24,7 @@ struct OpenFinder: ParsableCommand {
     )
     
     func run() throws {
-        let configListFolderPath = ConfigPathFactory.makeConfigListFolderPath(withHomeDirectory: true)
+        let configListFolderPath = ConfigPathFactory.makeConfigListFolderPath()
         
         try runAndPrint(bash: "open -a Finder \(configListFolderPath)")
     }

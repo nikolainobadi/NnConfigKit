@@ -12,12 +12,15 @@ final class ConfigPathFactoryTests: XCTestCase {
     func test_makeConfigFilePath() {
         let projectName = "project"
         let sut = makeSUT()
-        let filePath = sut.makeConfigFilePath(projectName: projectName)
-        let filePathWithHomeDirectory = sut.makeConfigFilePath(projectName: projectName, withHomeDirectory: true)
+        let configFolderPath = sut.makeConfigListFolderPath()
+        let projectConfigFolderPath = sut.makeProjectConfigFolderPath(projectName: projectName)
+        let projectConfigFilePath = sut.makeProjectConfigFilePath(projectName: projectName)
         
-        XCTAssertNotEqual(filePath, filePathWithHomeDirectory)
-        XCTAssertTrue(filePath.contains(projectName.withJSONExtension))
-        XCTAssertTrue(filePathWithHomeDirectory.contains(projectName.withJSONExtension))
+        XCTAssertTrue(configFolderPath.contains(ConfigPathFactory.configListPathSuffix))
+        XCTAssertFalse(configFolderPath.contains(projectName))
+        XCTAssertTrue(projectConfigFolderPath.contains(projectName))
+        XCTAssertFalse(projectConfigFolderPath.contains(projectName.withJSONExtension))
+        XCTAssertTrue(projectConfigFilePath.contains(projectName.withJSONExtension))
     }
 }
 

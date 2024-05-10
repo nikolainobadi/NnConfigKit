@@ -8,14 +8,24 @@
 import Files
 
 public enum ConfigPathFactory {
-    public static func makeConfigListFolderPath(withHomeDirectory: Bool = false) -> String {
-        let pathSuffix = ".config/NnConfigList/"
-        
-        return withHomeDirectory ? "\(Folder.home.path)/\(pathSuffix)" : pathSuffix
+    static var configListPathSuffix: String {
+        return ".config/NnConfigList/"
+    }
+}
+
+
+// MARK: - Helper Methods
+public extension ConfigPathFactory {
+    static func makeConfigListFolderPath() -> String {
+        return "\(Folder.home.path)/\(configListPathSuffix)"
     }
     
-    public static func makeConfigFilePath(projectName name: String, withHomeDirectory: Bool = false) -> String {
-        return "\(makeConfigListFolderPath(withHomeDirectory: withHomeDirectory))/\(name)/\(name.withJSONExtension)"
+    static func makeProjectConfigFolderPath(projectName: String) -> String {
+        return "\(makeConfigListFolderPath())/\(projectName)"
+    }
+    
+    static func makeProjectConfigFilePath(projectName name: String) -> String {
+        return "\(makeProjectConfigFolderPath(projectName: name))/\(name.withJSONExtension)"
     }
 }
 
