@@ -4,8 +4,16 @@
 import Files
 import Foundation
 
-public enum NnConfigGen {
-    public static func saveConfig<Config: NnConfig>(_ config: Config) throws {
+public enum NnConfigGen<Config: NnConfig> {
+    static var projectConfigFolderPath: String {
+        return "\(ConfigPathFactory.configListPathSuffix)/\(Config.projectName)"
+    }
+}
+
+
+// MARK: - Save/Load project config
+public extension NnConfigGen {
+    static func saveConfig(_ config: Config) throws {
         let configFilePath = ConfigPathFactory.configListPathSuffix
         let configFile = try Folder.home.createFileIfNeeded(at: configFilePath)
         let encoder = JSONEncoder.prettyOutput()
@@ -14,13 +22,56 @@ public enum NnConfigGen {
         try configFile.write(configData)
     }
     
-    public static func loadConfig<Config: NnConfig>() throws -> Config {
+    static func loadConfig() throws -> Config {
         let configFilePath = ConfigPathFactory.makeProjectConfigFilePath(projectName: Config.projectName)
         let configFile = try File(path: configFilePath)
         let data = try configFile.read()
         let decoder = JSONDecoder()
         
         return try decoder.decode(Config.self, from: data)
+    }
+}
+
+
+// MARK: - Save/Load nested project config files
+public extension NnConfigGen {
+    static func saveNestedFile(contents: String, nestedFilePath path: String) throws {
+        try createNestedFileIfNeeded(nestedPath: path).write(contents)
+    }
+    
+    static func appendToNestedFileIfNeeded(text: String, nestedFilePath path: String) throws {
+        let fileToUpdate = try createNestedFileIfNeeded(nestedPath: path)
+        let existingContents = try fileToUpdate.readAsString()
+        
+        if !existingContents.contains(text) {
+            try fileToUpdate.append(text)
+        }
+    }
+    
+    static func removeFromNestedFile(textToRemove text: String, nestedFilePath path: String) throws {
+        guard let projectConfigFolder = try? Folder.home.createSubfolder(at: projectConfigFolderPath) else { return }
+        guard let fileToUpdate = try? projectConfigFolder.createFile(at: path) else { return }
+        
+        let existingContents = try fileToUpdate.readAsString()
+        var lines = existingContents.components(separatedBy: .newlines)
+        lines.removeAll { line in
+            line == text.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        
+        let updatedContents = lines.joined(separator: "\n")
+        
+        try fileToUpdate.write(updatedContents)
+    }
+}
+
+
+// MARK: - Private Methods
+private extension NnConfigGen {
+    @discardableResult
+    static func createNestedFileIfNeeded(nestedPath: String) throws -> File {
+        let projectConfigFolder = try Folder.home.createSubfolderIfNeeded(at: projectConfigFolderPath)
+        
+        return try projectConfigFolder.createFileIfNeeded(at: nestedPath)
     }
 }
 
