@@ -39,28 +39,27 @@ public extension NnConfigGen {
         try createNestedFileIfNeeded(nestedPath: path).write(contents)
     }
     
-    static func appendToNestedFileIfNeeded(text: String, nestedFilePath path: String) throws {
+    static func appendToNestedFileIfNeeded(text: String, nestedFilePath path: String, asNewLine: Bool) throws {
         let fileToUpdate = try createNestedFileIfNeeded(nestedPath: path)
-        let existingContents = try fileToUpdate.readAsString()
         
-        if !existingContents.contains(text) {
-            try fileToUpdate.append(text)
-        }
+        try appendToFileIfNeeded(text: text, fileToUpdate: fileToUpdate, asNewLine: asNewLine)
     }
     
     static func removeFromNestedFile(textToRemove text: String, nestedFilePath path: String) throws {
         guard let projectConfigFolder = try? Folder.home.createSubfolder(at: projectConfigFolderPath) else { return }
         guard let fileToUpdate = try? projectConfigFolder.createFile(at: path) else { return }
         
-        let existingContents = try fileToUpdate.readAsString()
-        var lines = existingContents.components(separatedBy: .newlines)
-        lines.removeAll { line in
-            line == text.trimmingCharacters(in: .whitespacesAndNewlines)
-        }
+        try removeFromFile(textToRemove: text, fileToUpdate: fileToUpdate)
+    }
+}
+
+
+// MARK: - Helper Methods
+public extension NnConfigGen {
+    static func appendToZSHRCFileIfNeeded(text: String, asNewLine: Bool) throws {
+        let fileToUpdate = try Folder.home.createFileIfNeeded(withName: ".zshrc")
         
-        let updatedContents = lines.joined(separator: "\n")
-        
-        try fileToUpdate.write(updatedContents)
+        try appendToFileIfNeeded(text: text, fileToUpdate: fileToUpdate, asNewLine: true)
     }
 }
 
@@ -72,6 +71,26 @@ private extension NnConfigGen {
         let projectConfigFolder = try Folder.home.createSubfolderIfNeeded(at: projectConfigFolderPath)
         
         return try projectConfigFolder.createFileIfNeeded(at: nestedPath)
+    }
+    
+    static func appendToFileIfNeeded(text: String, fileToUpdate: File, asNewLine: Bool) throws {
+        let existingContents = try fileToUpdate.readAsString()
+        
+        if !existingContents.contains(text) {
+            try fileToUpdate.append(asNewLine ? "\n\(text)" : text)
+        }
+    }
+    
+    static func removeFromFile(textToRemove text: String, fileToUpdate: File) throws {
+        let existingContents = try fileToUpdate.readAsString()
+        var lines = existingContents.components(separatedBy: .newlines)
+        lines.removeAll { line in
+            line == text.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        
+        let updatedContents = lines.joined(separator: "\n")
+        
+        try fileToUpdate.write(updatedContents)
     }
 }
 
