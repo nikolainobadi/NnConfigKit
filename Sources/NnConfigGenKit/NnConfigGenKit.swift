@@ -6,7 +6,7 @@ import Foundation
 
 public enum NnConfigGen<Config: NnConfig> {
     static var configListPathSuffix: String {
-        return ".config/NnConfigList/"
+        return ".config/NnConfigList"
     }
     
     static var projectConfigFolderPathSuffix: String {
@@ -65,7 +65,7 @@ public extension NnConfigGen {
 // MARK: - Helper Methods
 public extension NnConfigGen {
     static func getConfigListFolderFullPath() -> String {
-        return "\(Folder.home.path)/\(configListPathSuffix)"
+        return "\(Folder.home.path)\(configListPathSuffix)"
     }
     
     static func appendToZSHRCFileIfNeeded(text: String, asNewLine: Bool) throws {
@@ -81,7 +81,7 @@ private extension NnConfigGen {
     static func makeProjectConfigFilePath(fullPath: Bool) -> String {
         let suffix = "\(configListPathSuffix)/\(Config.projectName)/\(Config.projectName.json)"
         
-        return fullPath ? "\(Folder.home.path)/\(suffix)" : suffix
+        return fullPath ? "\(Folder.home.path)\(suffix)" : suffix
     }
     
     @discardableResult
