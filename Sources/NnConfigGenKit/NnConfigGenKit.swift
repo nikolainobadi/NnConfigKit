@@ -5,8 +5,12 @@ import Files
 import Foundation
 
 public enum NnConfigGen<Config: NnConfig> {
-    static var projectConfigFolderPath: String {
-        return "\(ConfigPathFactory.configListPathSuffix)/\(Config.projectName)"
+    static var configListPathSuffix: String {
+        return ".config/NnConfigList/"
+    }
+    
+    static var projectConfigFolderPathSuffix: String {
+        return "\(configListPathSuffix)/\(Config.projectName)"
     }
 }
 
@@ -14,7 +18,8 @@ public enum NnConfigGen<Config: NnConfig> {
 // MARK: - Save/Load project config
 public extension NnConfigGen {
     static func saveConfig(_ config: Config) throws {
-        let configFile = try Folder.home.createFileIfNeeded(at: makeProjectConfigFilePath())
+        let path = makeProjectConfigFilePath(fullPath: false)
+        let configFile = try Folder.home.createFileIfNeeded(at: path)
         print("creating config at path: \(configFile.path)")
         let encoder = JSONEncoder.prettyOutput()
         let configData = try encoder.encode(config)
@@ -23,7 +28,8 @@ public extension NnConfigGen {
     }
     
     static func loadConfig() throws -> Config {
-        let configFile = try File(path: makeProjectConfigFilePath())
+        let path = makeProjectConfigFilePath(fullPath: true)
+        let configFile = try File(path: path)
         let data = try configFile.read()
         let decoder = JSONDecoder()
         
@@ -58,6 +64,10 @@ public extension NnConfigGen {
 
 // MARK: - Helper Methods
 public extension NnConfigGen {
+    static func getConfigListFolderFullPath() -> String {
+        return "\(Folder.home.path)/\(configListPathSuffix)"
+    }
+    
     static func appendToZSHRCFileIfNeeded(text: String, asNewLine: Bool) throws {
         let fileToUpdate = try Folder.home.createFileIfNeeded(withName: ".zshrc")
         
@@ -68,13 +78,15 @@ public extension NnConfigGen {
 
 // MARK: - Private Methods
 private extension NnConfigGen {
-    static func makeProjectConfigFilePath() -> String {
-        return ConfigPathFactory.makeProjectConfigFilePath(projectName: Config.projectName)
+    static func makeProjectConfigFilePath(fullPath: Bool) -> String {
+        let suffix = "\(configListPathSuffix)/\(Config.projectName)/\(Config.projectName.json)"
+        
+        return fullPath ? "\(Folder.home.path)/\(suffix)" : suffix
     }
     
     @discardableResult
     static func createNestedFileIfNeeded(nestedPath: String) throws -> File {
-        let projectConfigFolder = try Folder.home.createSubfolderIfNeeded(at: projectConfigFolderPath)
+        let projectConfigFolder = try Folder.home.createSubfolderIfNeeded(at: projectConfigFolderPathSuffix)
         
         return try projectConfigFolder.createFileIfNeeded(at: nestedPath)
     }
@@ -100,7 +112,7 @@ private extension NnConfigGen {
     }
     
     static func getNestedFile(path: String) -> File? {
-        return try? Folder.home.subfolder(at: projectConfigFolderPath).file(at: path)
+        return try? Folder.home.subfolder(at: projectConfigFolderPathSuffix).file(at: path)
     }
 }
 
@@ -112,6 +124,12 @@ public protocol NnConfig: Codable {
 
 
 // MARK: - Extension Dependencies
+extension String {
+    var json: String {
+        return "\(self).json"
+    }
+}
+
 public extension JSONEncoder {
     static func prettyOutput() -> JSONEncoder {
         let encoder = JSONEncoder()

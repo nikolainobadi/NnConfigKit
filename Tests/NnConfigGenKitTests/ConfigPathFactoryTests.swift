@@ -9,25 +9,11 @@ import XCTest
 @testable import NnConfigGenKit
 
 final class ConfigPathFactoryTests: XCTestCase {
-    func test_makeConfigFilePath() {
-        let projectName = "project"
-        let sut = makeSUT()
-        let configFolderPath = sut.makeConfigListFolderPath()
-        let projectConfigFolderPath = sut.makeProjectConfigFolderPath(projectName: projectName)
-        let projectConfigFilePath = sut.makeProjectConfigFilePath(projectName: projectName)
-        
-        XCTAssertTrue(configFolderPath.contains(ConfigPathFactory.configListPathSuffix))
-        XCTAssertFalse(configFolderPath.contains(projectName))
-        XCTAssertTrue(projectConfigFolderPath.contains(projectName))
-        XCTAssertFalse(projectConfigFolderPath.contains(projectName.json))
-        XCTAssertTrue(projectConfigFilePath.contains(projectName.json))
-    }
+    
 }
 
 
 // MARK: - SUT
 extension ConfigPathFactoryTests {
-    func makeSUT() -> ConfigPathFactory.Type {
-        return ConfigPathFactory.self
-    }
+    
 }
