@@ -19,8 +19,8 @@ final class ConfigPathFactoryTests: XCTestCase {
         XCTAssertTrue(configFolderPath.contains(ConfigPathFactory.configListPathSuffix))
         XCTAssertFalse(configFolderPath.contains(projectName))
         XCTAssertTrue(projectConfigFolderPath.contains(projectName))
-        XCTAssertFalse(projectConfigFolderPath.contains(projectName.withJSONExtension))
-        XCTAssertTrue(projectConfigFilePath.contains(projectName.withJSONExtension))
+        XCTAssertFalse(projectConfigFolderPath.contains(projectName.json))
+        XCTAssertTrue(projectConfigFilePath.contains(projectName.json))
     }
 }
 

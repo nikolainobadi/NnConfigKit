@@ -25,14 +25,14 @@ public extension ConfigPathFactory {
     }
     
     static func makeProjectConfigFilePath(projectName name: String) -> String {
-        return "\(makeProjectConfigFolderPath(projectName: name))/\(name.withJSONExtension)"
+        return "\(makeProjectConfigFolderPath(projectName: name))/\(name.json)"
     }
 }
 
 
 // MARK: - Dependencies
 extension String {
-    var withJSONExtension: String {
+    var json: String {
         return "\(self).json"
     }
 }

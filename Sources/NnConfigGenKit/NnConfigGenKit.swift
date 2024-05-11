@@ -14,8 +14,7 @@ public enum NnConfigGen<Config: NnConfig> {
 // MARK: - Save/Load project config
 public extension NnConfigGen {
     static func saveConfig(_ config: Config) throws {
-        let configFilePath = ConfigPathFactory.configListPathSuffix
-        let configFile = try Folder.home.createFileIfNeeded(at: configFilePath)
+        let configFile = try Folder.home.createFileIfNeeded(at: makeProjectConfigFilePath())
         let encoder = JSONEncoder.prettyOutput()
         let configData = try encoder.encode(config)
         
@@ -23,8 +22,7 @@ public extension NnConfigGen {
     }
     
     static func loadConfig() throws -> Config {
-        let configFilePath = ConfigPathFactory.makeProjectConfigFilePath(projectName: Config.projectName)
-        let configFile = try File(path: configFilePath)
+        let configFile = try File(path: makeProjectConfigFilePath())
         let data = try configFile.read()
         let decoder = JSONDecoder()
         
@@ -69,6 +67,10 @@ public extension NnConfigGen {
 
 // MARK: - Private Methods
 private extension NnConfigGen {
+    static func makeProjectConfigFilePath() -> String {
+        return ConfigPathFactory.makeProjectConfigFilePath(projectName: Config.projectName)
+    }
+    
     @discardableResult
     static func createNestedFileIfNeeded(nestedPath: String) throws -> File {
         let projectConfigFolder = try Folder.home.createSubfolderIfNeeded(at: projectConfigFolderPath)
