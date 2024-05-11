@@ -20,7 +20,6 @@ public extension NnConfigGen {
     static func saveConfig(_ config: Config) throws {
         let path = makeProjectConfigFilePath(fullPath: false)
         let configFile = try Folder.home.createFileIfNeeded(at: path)
-        print("creating config at path: \(configFile.path)")
         let encoder = JSONEncoder.prettyOutput()
         let configData = try encoder.encode(config)
         
