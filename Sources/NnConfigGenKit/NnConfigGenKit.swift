@@ -33,10 +33,14 @@ public extension NnConfigGen {
 }
 
 
-// MARK: - Save/Load nested project config files
+// MARK: - Save/Update/Delete nested project config files
 public extension NnConfigGen {
     static func saveNestedFile(contents: String, nestedFilePath path: String) throws {
         try createNestedFileIfNeeded(nestedPath: path).write(contents)
+    }
+    
+    static func deleteNestedFile(nestedFilePath path: String) throws {
+        try getNestedFile(path: path)?.delete()
     }
     
     static func appendToNestedFileIfNeeded(text: String, nestedFilePath path: String, asNewLine: Bool) throws {
@@ -46,8 +50,7 @@ public extension NnConfigGen {
     }
     
     static func removeFromNestedFile(textToRemove text: String, nestedFilePath path: String) throws {
-        guard let projectConfigFolder = try? Folder.home.createSubfolder(at: projectConfigFolderPath) else { return }
-        guard let fileToUpdate = try? projectConfigFolder.createFile(at: path) else { return }
+        guard let fileToUpdate = getNestedFile(path: path) else { return }
         
         try removeFromFile(textToRemove: text, fileToUpdate: fileToUpdate)
     }
@@ -91,6 +94,10 @@ private extension NnConfigGen {
         let updatedContents = lines.joined(separator: "\n")
         
         try fileToUpdate.write(updatedContents)
+    }
+    
+    static func getNestedFile(path: String) -> File? {
+        return try? Folder.home.subfolder(at: projectConfigFolderPath).file(at: path)
     }
 }
 
