@@ -25,7 +25,6 @@ public extension NnConfigManager {
     }
 }
 
-
 // MARK: - Save
 public extension NnConfigManager {
     func saveConfig(_ config: Config) throws {

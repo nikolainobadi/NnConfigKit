@@ -10,6 +10,15 @@
       }
     },
     {
+      "identity" : "nntestkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/nikolainobadi/NnTestKit",
+      "state" : {
+        "branch" : "main",
+        "revision" : "6312b6b89bd78defcfc7698820012236188547a4"
+      }
+    },
+    {
       "identity" : "swift-argument-parser",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-argument-parser.git",
