@@ -10,7 +10,7 @@ import Files
 /// The default folder path for configuration lists.
 let DEFAULT_CONFIGLIST_FOLDER_PATH = "\(Folder.home.path).config/NnConfigList"
 
-extension NnConfig {
+public extension NnConfig {
     /// Computes the path to the configuration folder based on the project name.
     static var configFolderPath: String {
         return "\(DEFAULT_CONFIGLIST_FOLDER_PATH)/\(projectName)"
