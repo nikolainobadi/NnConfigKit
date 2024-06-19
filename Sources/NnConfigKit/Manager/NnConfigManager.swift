@@ -8,6 +8,7 @@
 import Files
 import Foundation
 
+/// A manager for handling configuration operations such as loading, saving, and managing nested configuration files.
 public struct NnConfigManager<Config: NnConfig> {
     public init() { }
 }
@@ -15,43 +16,56 @@ public struct NnConfigManager<Config: NnConfig> {
 
 // MARK: - Load
 public extension NnConfigManager {
+    /// Loads the configuration from the configuration file.
+    /// - Throws: An error if the configuration file cannot be read or decoded.
+    /// - Returns: The loaded configuration object.
     func loadConfig() throws -> Config {
         let configFolder = try Folder(path: Config.configFolderPath)
         let configFile = try configFolder.file(named: Config.configFileName.json)
         let data = try configFile.read()
         let decoder = JSONDecoder()
-        
         return try decoder.decode(Config.self, from: data)
     }
 }
 
+
 // MARK: - Save
 public extension NnConfigManager {
+    /// Saves the configuration to the configuration file.
+    /// - Parameter config: The configuration object to be saved.
+    /// - Throws: An error if the configuration file cannot be written.
     func saveConfig(_ config: Config) throws {
         let configFolder = try createFolderIfNeeded(path: Config.configFolderPath)
         let configFile = try configFolder.createFileIfNeeded(withName: Config.configFileName.json)
         let configData = try JSONEncoder.prettyOutput().encode(config)
-        
         try configFile.write(configData)
     }
-    
+
+    /// Appends text to a file if the text does not already exist in the file.
+    /// - Parameters:
+    ///   - text: The text to be appended.
+    ///   - fileToUpdate: The file to update.
+    ///   - asNewLine: Whether to append the text as a new line.
+    /// - Throws: An error if the file cannot be read or written.
     func appendTextToFileIfNeeded(text: String, fileToUpdate: File, asNewLine: Bool) throws {
         let existingContents = try fileToUpdate.readAsString()
-        
         if !existingContents.contains(text) {
             try fileToUpdate.append(asNewLine ? "\n\(text)" : text)
         }
     }
-    
+
+    /// Removes text from a file.
+    /// - Parameters:
+    ///   - text: The text to be removed.
+    ///   - fileToUpdate: The file to update.
+    /// - Throws: An error if the file cannot be read or written.
     func removeTextFromFile(text: String, fileToUpdate: File) throws {
         let existingContents = try fileToUpdate.readAsString()
         var lines = existingContents.components(separatedBy: .newlines)
         lines.removeAll { line in
             line == text.trimmingCharacters(in: .whitespacesAndNewlines)
         }
-        
         let updatedContents = lines.joined(separator: "\n")
-        
         try fileToUpdate.write(updatedContents)
     }
 }
@@ -59,26 +73,43 @@ public extension NnConfigManager {
 
 // MARK: - NestedConfigFiles
 public extension NnConfigManager {
+    /// Saves a nested configuration file with the specified contents.
+    /// - Parameters:
+    ///   - contents: The contents to be written to the nested file.
+    ///   - nestedFilePath: The path to the nested file.
+    /// - Throws: An error if the nested file cannot be created or written.
     func saveNestedConfigFile(contents: String, nestedFilePath: String) throws {
         let configFolder = try createFolderIfNeeded(path: Config.configFolderPath)
         let nestedFile = try configFolder.createFileIfNeeded(at: nestedFilePath)
-        
         try nestedFile.write(contents)
     }
-    
+
+    /// Deletes a nested configuration file at the specified path.
+    /// - Parameter nestedFilePath: The path to the nested file.
+    /// - Throws: An error if the nested file cannot be deleted.
     func deletedNestedConfigFile(nestedFilePath: String) throws {
         if let nestedFile = try? Folder(path: Config.configFolderPath).file(at: nestedFilePath) {
             try nestedFile.delete()
         }
     }
-    
+
+    /// Appends text to a nested configuration file if the text does not already exist in the file.
+    /// - Parameters:
+    ///   - text: The text to be appended.
+    ///   - nestedFilePath: The path to the nested file.
+    ///   - asNewLine: Whether to append the text as a new line.
+    /// - Throws: An error if the nested file cannot be created or written.
     func appendTextToNestedConfigFileIfNeeded(text: String, nestedFilePath: String, asNewLine: Bool = true) throws {
         let configFolder = try createFolderIfNeeded(path: Config.configFolderPath)
         let nestedFile = try configFolder.createFileIfNeeded(at: nestedFilePath)
-        
         try appendTextToFileIfNeeded(text: text, fileToUpdate: nestedFile, asNewLine: asNewLine)
     }
-    
+
+    /// Removes text from a nested configuration file.
+    /// - Parameters:
+    ///   - text: The text to be removed.
+    ///   - nestedFilePath: The path to the nested file.
+    /// - Throws: An error if the nested file cannot be read or written.
     func removeTextFromNestedConfigFile(text: String, nestedFilePath: String) throws {
         if let nestedFile = try? Folder(path: Config.configFolderPath).file(at: nestedFilePath) {
             try removeTextFromFile(text: text, fileToUpdate: nestedFile)
@@ -89,6 +120,10 @@ public extension NnConfigManager {
 
 // MARK: - Private Methods
 private extension NnConfigManager {
+    /// Creates a folder if it does not already exist.
+    /// - Parameter path: The path to the folder.
+    /// - Throws: An error if the folder cannot be created.
+    /// - Returns: The created or existing folder.
     func createFolderIfNeeded(path: String) throws -> Folder {
         if let folder = try? Folder(path: path) {
             return folder

@@ -125,12 +125,3 @@ extension String {
         return self.hasSuffix(".json") ? self : "\(self).json"
     }
 }
-
-public extension JSONEncoder {
-    static func prettyOutput() -> JSONEncoder {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = .prettyPrinted
-        
-        return encoder
-    }
-}
