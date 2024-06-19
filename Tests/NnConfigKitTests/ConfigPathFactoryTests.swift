@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import NnConfigGenKit
+@testable import NnConfigKit
 
 final class ConfigPathFactoryTests: XCTestCase {
     

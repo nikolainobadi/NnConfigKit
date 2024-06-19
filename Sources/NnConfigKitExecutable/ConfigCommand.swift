@@ -6,7 +6,7 @@
 //
 
 import SwiftShell
-import NnConfigGenKit
+import NnConfigKit
 import ArgumentParser
 
 struct ConfigCommand: ParsableCommand {
