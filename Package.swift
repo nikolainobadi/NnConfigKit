@@ -2,15 +2,15 @@
 import PackageDescription
 
 let package = Package(
-    name: "NnConfigGenKit",
+    name: "NnConfigKit",
     products: [
         .library(
-            name: "NnConfigGenKit",
-            targets: ["NnConfigGenKit"]
+            name: "NnConfigKit",
+            targets: ["NnConfigKit"]
         ),
         .executable(
-            name: "NnConfigGenKitExecutable",
-            targets: ["NnConfigGenKitExecutable"]
+            name: "NnConfigKitExecutable",
+            targets: ["NnConfigKitExecutable"]
         )
     ],
     dependencies: [
@@ -20,7 +20,7 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "NnConfigGenKit",
+            name: "NnConfigKit",
             dependencies: [
                 "Files",
                 "SwiftShell",
@@ -28,12 +28,12 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "NnConfigGenKitTests",
-            dependencies: ["NnConfigGenKit"]
+            name: "NnConfigKitTests",
+            dependencies: ["NnConfigKit"]
         ),
         .executableTarget(
-            name: "NnConfigGenKitExecutable",
-            dependencies: ["NnConfigGenKit"]
+            name: "NnConfigKitExecutable",
+            dependencies: ["NnConfigKit"]
         )
     ]
 )
