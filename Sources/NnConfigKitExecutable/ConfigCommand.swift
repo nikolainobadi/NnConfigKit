@@ -5,6 +5,7 @@
 //  Created by Nikolai Nobadi on 5/5/24.
 //
 
+import Files
 import SwiftShell
 import NnConfigKit
 import ArgumentParser
@@ -24,6 +25,6 @@ struct OpenFinder: ParsableCommand {
     )
     
     func run() throws {
-        try runAndPrint(bash: "open -a Finder ~/.config/NnConfigList")
+        try runAndPrint(bash: "open -a Finder \(Folder.home.path).config/NnConfigList")
     }
 }
