@@ -116,16 +116,13 @@ private extension NnConfigGen {
 }
 
 
-// MARK: - Dependencies
-public protocol NnConfig: Codable {
-    static var projectName: String { get }
-}
-
 
 // MARK: - Extension Dependencies
 extension String {
     var json: String {
-        return "\(self).json"
+        if self.isEmpty { return "" }
+        
+        return self.hasSuffix(".json") ? self : "\(self).json"
     }
 }
 
