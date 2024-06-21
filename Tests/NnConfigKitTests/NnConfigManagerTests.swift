@@ -125,7 +125,7 @@ extension NnConfigManagerTests {
 
 // MARK: - Helpers
 extension NnConfigManagerTests {
-    class MockConfig: NnConfig, Equatable {
+    class MockConfig: Codable, Equatable {
         static func == (lhs: NnConfigManagerTests.MockConfig, rhs: NnConfigManagerTests.MockConfig) -> Bool {
             return lhs.firstSetting == rhs.firstSetting && lhs.secondSetting == rhs.secondSetting
         }

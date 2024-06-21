@@ -25,6 +25,6 @@ struct OpenFinder: ParsableCommand {
     )
     
     func run() throws {
-        try runAndPrint(bash: "open -a Finder \(Folder.home.path).config/NnConfigList")
+        try runAndPrint(bash: "open -a Finder \(DEFAULT_CONFIGLIST_FOLDER_PATH)")
     }
 }

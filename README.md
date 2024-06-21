@@ -4,7 +4,7 @@
 
 ## Features
 
-- Define configuration objects using the `NnConfig` protocol.
+- Define configuration objects using the `Codable` protocol.
 - Load and save configuration files with ease.
 - Manage nested configuration files.
 - Append or remove text in configuration files.
@@ -37,13 +37,13 @@ let package = Package(
 
 ### Define Your Configuration
 
-First, create a struct that conforms to the `NnConfig` protocol:
+First, create a struct that conforms to the `Codable` protocol:
 
 ```swift
 import NnConfigKit
 
-struct MyConfig: NnConfig {
-    static var projectName: String = "MyProject"
+struct MyConfig: Codable {
+    // codable properties here
 }
 ```
 

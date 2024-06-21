@@ -8,20 +8,19 @@
 import Files
 import Foundation
 
-let DEFAULT_CONFIGLIST_FOLDER_PATH = "\(Folder.home.path).config/NnConfigList"
+public let DEFAULT_CONFIGLIST_FOLDER_PATH = "\(Folder.home.path).config/NnConfigList"
 
 /// A manager for handling configuration operations such as loading, saving, and managing nested configuration files.
-public struct NnConfigManager<Config: NnConfig> {
+public struct NnConfigManager<Config: Codable> {
     let projectName: String
     let configFolderPath: String
     let configFileName: String
     
     public init(projectName: String, configFolderPath: String? = nil, configFileName: String? = nil) {
         self.projectName = projectName
-        self.configFolderPath = configFolderPath ?? DEFAULT_CONFIGLIST_FOLDER_PATH
+        self.configFolderPath = configFolderPath ?? "\(DEFAULT_CONFIGLIST_FOLDER_PATH)/\(projectName)"
         self.configFileName = configFileName ?? projectName
     }
-//    public init() { }
 }
 
 
