@@ -8,9 +8,20 @@
 import Files
 import Foundation
 
+let DEFAULT_CONFIGLIST_FOLDER_PATH = "\(Folder.home.path).config/NnConfigList"
+
 /// A manager for handling configuration operations such as loading, saving, and managing nested configuration files.
 public struct NnConfigManager<Config: NnConfig> {
-    public init() { }
+    let projectName: String
+    let configFolderPath: String
+    let configFileName: String
+    
+    public init(projectName: String, configFolderPath: String? = nil, configFileName: String? = nil) {
+        self.projectName = projectName
+        self.configFolderPath = configFolderPath ?? DEFAULT_CONFIGLIST_FOLDER_PATH
+        self.configFileName = configFileName ?? projectName
+    }
+//    public init() { }
 }
 
 
@@ -20,8 +31,8 @@ public extension NnConfigManager {
     /// - Throws: An error if the configuration file cannot be read or decoded.
     /// - Returns: The loaded configuration object.
     func loadConfig() throws -> Config {
-        let configFolder = try Folder(path: Config.configFolderPath)
-        let configFile = try configFolder.file(named: Config.configFileName.json)
+        let configFolder = try Folder(path: configFolderPath)
+        let configFile = try configFolder.file(named: configFileName.json)
         let data = try configFile.read()
         let decoder = JSONDecoder()
         return try decoder.decode(Config.self, from: data)
@@ -35,8 +46,8 @@ public extension NnConfigManager {
     /// - Parameter config: The configuration object to be saved.
     /// - Throws: An error if the configuration file cannot be written.
     func saveConfig(_ config: Config) throws {
-        let configFolder = try createFolderIfNeeded(path: Config.configFolderPath)
-        let configFile = try configFolder.createFileIfNeeded(withName: Config.configFileName.json)
+        let configFolder = try createFolderIfNeeded(path: configFolderPath)
+        let configFile = try configFolder.createFileIfNeeded(withName: configFileName.json)
         let configData = try JSONEncoder.prettyOutput().encode(config)
         try configFile.write(configData)
     }
@@ -79,7 +90,7 @@ public extension NnConfigManager {
     ///   - nestedFilePath: The path to the nested file.
     /// - Throws: An error if the nested file cannot be created or written.
     func saveNestedConfigFile(contents: String, nestedFilePath: String) throws {
-        let configFolder = try createFolderIfNeeded(path: Config.configFolderPath)
+        let configFolder = try createFolderIfNeeded(path: configFolderPath)
         let nestedFile = try configFolder.createFileIfNeeded(at: nestedFilePath)
         try nestedFile.write(contents)
     }
@@ -88,7 +99,7 @@ public extension NnConfigManager {
     /// - Parameter nestedFilePath: The path to the nested file.
     /// - Throws: An error if the nested file cannot be deleted.
     func deletedNestedConfigFile(nestedFilePath: String) throws {
-        if let nestedFile = try? Folder(path: Config.configFolderPath).file(at: nestedFilePath) {
+        if let nestedFile = try? Folder(path: configFolderPath).file(at: nestedFilePath) {
             try nestedFile.delete()
         }
     }
@@ -100,7 +111,7 @@ public extension NnConfigManager {
     ///   - asNewLine: Whether to append the text as a new line.
     /// - Throws: An error if the nested file cannot be created or written.
     func appendTextToNestedConfigFileIfNeeded(text: String, nestedFilePath: String, asNewLine: Bool = true) throws {
-        let configFolder = try createFolderIfNeeded(path: Config.configFolderPath)
+        let configFolder = try createFolderIfNeeded(path: configFolderPath)
         let nestedFile = try configFolder.createFileIfNeeded(at: nestedFilePath)
         try appendTextToFileIfNeeded(text: text, fileToUpdate: nestedFile, asNewLine: asNewLine)
     }
@@ -111,7 +122,7 @@ public extension NnConfigManager {
     ///   - nestedFilePath: The path to the nested file.
     /// - Throws: An error if the nested file cannot be read or written.
     func removeTextFromNestedConfigFile(text: String, nestedFilePath: String) throws {
-        if let nestedFile = try? Folder(path: Config.configFolderPath).file(at: nestedFilePath) {
+        if let nestedFile = try? Folder(path: configFolderPath).file(at: nestedFilePath) {
             try removeTextFromFile(text: text, fileToUpdate: nestedFile)
         }
     }
@@ -132,5 +143,15 @@ private extension NnConfigManager {
         try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true)
         
         return try Folder(path: path)
+    }
+}
+
+
+// MARK: - Extension Dependencies
+extension String {
+    var json: String {
+        if self.isEmpty { return "" }
+        
+        return self.hasSuffix(".json") ? self : "\(self).json"
     }
 }

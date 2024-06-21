@@ -28,22 +28,23 @@ final class NnConfigManagerTests: XCTestCase {
 // MARK: - Default Config Folder Tests
 extension NnConfigManagerTests {
     func test_loadConfig_defaultConfigFolder_throwsErrorWhenMissingConfig() {
-        saveConfig(CustomConfig())
+        saveConfig(makeConfig(), configType: .customConfig)
         
-        XCTAssertThrowsError(try NnConfigManager<DefaultConfig>().loadConfig())
+        XCTAssertThrowsError(try makeSUT(type: .defaultConfig).loadConfig())
     }
     
     func test_saveConfig_loadConfig_saveUpdated_defaultConfigFolder() throws {
-        let customConfig = DefaultConfig()
-        let updatedConfig = DefaultConfig(secondSetting: "newSetting")
+        let customConfig = makeConfig()
+        let updatedConfig = makeConfig(secondSetting: "newSetting")
         
-        try runSaveLoadUpdateTest(for: customConfig, updatedConfig: updatedConfig)
+        try runSaveLoadUpdateTest(for: customConfig, updatedConfig: updatedConfig, configType: .defaultConfig)
     }
     
     func test_saveNestedConfigFile_deleteNestedConfigFile_defaultConfigFolder() throws {
         let nestedFilePath = "NestedFolder/NestedFile"
-        let completeFilePath = "\(DefaultConfig.configFolderPath)/\(nestedFilePath)"
-        let sut = NnConfigManager<DefaultConfig>()
+        let sut = makeSUT(type: .defaultConfig)
+        let configFolderPath = sut.configFolderPath
+        let completeFilePath = "\(configFolderPath)/\(nestedFilePath)"
         let contents = makeNestedContent()
         
         XCTAssertNil(try? File(path: completeFilePath))
@@ -62,9 +63,10 @@ extension NnConfigManagerTests {
         let contents = makeNestedContent()
         let existingLine = sampleTextLines[0]
         let nestedFilePath = "NestedFolder/NestedFile"
-        let completeFilePath = "\(DefaultConfig.configFolderPath)/\(nestedFilePath)"
-        let sut = NnConfigManager<DefaultConfig>()
-        
+        let sut = makeSUT(type: .defaultConfig)
+        let configFolderPath = sut.configFolderPath
+        let completeFilePath = "\(configFolderPath)/\(nestedFilePath)"
+
         XCTAssertNil(try? File(path: completeFilePath))
         
         try sut.saveNestedConfigFile(contents: contents, nestedFilePath: nestedFilePath)
@@ -91,24 +93,40 @@ extension NnConfigManagerTests {
 // MARK: - Custom Folder Tests
 extension NnConfigManagerTests {
     func test_loadConfig_customConfigFolder_throwsErrorWhenMissingConfig() throws {
-        saveConfig(DefaultConfig())
+        saveConfig(makeConfig(), configType: .defaultConfig)
         
-        XCTAssertThrowsError(try NnConfigManager<CustomConfig>().loadConfig())
+        XCTAssertThrowsError(try makeSUT(type: .customConfig).loadConfig())
     }
     
     func test_saveConfig_customConfigFolder() throws {
-        let customConfig = CustomConfig()
-        let updatedConfig = CustomConfig(secondSetting: "newSetting")
+        let customConfig = makeConfig()
+        let updatedConfig = makeConfig(secondSetting: "newSetting")
         
-        try runSaveLoadUpdateTest(for: customConfig, updatedConfig: updatedConfig)
+        try runSaveLoadUpdateTest(for: customConfig, updatedConfig: updatedConfig, configType: .customConfig)
     }
 }
 
 
-// MARK: - Helper Classes
+// MARK: - SUT
 extension NnConfigManagerTests {
-    class BaseConfig: Codable, Equatable {
-        static func == (lhs: NnConfigManagerTests.BaseConfig, rhs: NnConfigManagerTests.BaseConfig) -> Bool {
+    func makeSUT(type: ConfigType) -> NnConfigManager<MockConfig> {
+        return .init(
+            projectName: type.projectName,
+            configFolderPath: type.configFolderPath,
+            configFileName: type.configFileName
+        )
+    }
+    
+    func makeConfig(firstSetting: Int = 0, secondSetting: String = "something to remember") -> MockConfig {
+        return .init(firstSetting: firstSetting, secondSetting: secondSetting)
+    }
+}
+
+
+// MARK: - Helpers
+extension NnConfigManagerTests {
+    class MockConfig: NnConfig, Equatable {
+        static func == (lhs: NnConfigManagerTests.MockConfig, rhs: NnConfigManagerTests.MockConfig) -> Bool {
             return lhs.firstSetting == rhs.firstSetting && lhs.secondSetting == rhs.secondSetting
         }
         
@@ -121,18 +139,19 @@ extension NnConfigManagerTests {
         }
     }
     
-    class DefaultConfig: BaseConfig, NnConfig  {
-        static var projectName: String = "DefaultNnConfigKitTestProject"
-    }
-    
-    class CustomConfig: BaseConfig, NnConfig {
-        static var projectName: String = "CustomNnConfigKitTestProject"
-        static var configFolderPath: String {
-            "\(Folder.temporary.path).testConfig/NnConfigList/\(projectName)"
+    enum ConfigType: CaseIterable {
+        case defaultConfig, customConfig
+        
+        var projectName: String {
+            return "\(self == .defaultConfig ? "Default" : "Custom")NnConfigKitTestProject"
         }
         
-        static var configFileName: String {
-            return "\(projectName)-custom.json"
+        var configFolderPath: String? {
+            return self == .defaultConfig ? nil : "\(Folder.temporary.path).testConfig/NnConfigList/\(projectName)"
+        }
+        
+        var configFileName: String? {
+            return self == .defaultConfig ? nil : "\(projectName)-custom.json"
         }
     }
 }
@@ -140,8 +159,8 @@ extension NnConfigManagerTests {
 
 // MARK: - Assertion Helpers
 extension NnConfigManagerTests {
-    func runSaveLoadUpdateTest<Config: NnConfig & Equatable>(for config: Config, updatedConfig: Config) throws {
-        let sut = NnConfigManager<Config>()
+    func runSaveLoadUpdateTest(for config: MockConfig, updatedConfig: MockConfig, configType: ConfigType) throws {
+        let sut = makeSUT(type: configType)
         
         try sut.saveConfig(config)
         
@@ -165,16 +184,18 @@ private extension NnConfigManagerTests {
         return sampleTextLines.joined(separator: "\n")
     }
     
-    func saveConfig<Config: NnConfig>(_ config: Config, file: StaticString = #filePath, line: UInt = #line) {
+    func saveConfig(_ config: MockConfig, configType: ConfigType, file: StaticString = #filePath, line: UInt = #line) {
+        let sut = makeSUT(type: configType)
+        
         assertNoErrorThrown(
-            action: { try NnConfigManager<Config>().saveConfig(config) },
+            action: { try sut.saveConfig(config) },
             file: file, line: line
         )
     }
     
     func cleanConfigFolders() throws {
-        try deleteExistingFolder(path: CustomConfig.configFolderPath)
-        try deleteExistingFolder(path: DefaultConfig.configFolderPath)
+        try deleteExistingFolder(path: DEFAULT_CONFIGLIST_FOLDER_PATH)
+        try deleteExistingFolder(path: ConfigType.customConfig.configFolderPath!)
     }
     
     func deleteExistingFolder(path: String) throws {
