@@ -194,8 +194,8 @@ private extension NnConfigManagerTests {
     }
     
     func cleanConfigFolders() throws {
-        try deleteExistingFolder(path: DEFAULT_CONFIGLIST_FOLDER_PATH)
         try deleteExistingFolder(path: ConfigType.customConfig.configFolderPath!)
+        try deleteExistingFolder(path: "\(DEFAULT_CONFIGLIST_FOLDER_PATH)/\(ConfigType.defaultConfig.projectName)")
     }
     
     func deleteExistingFolder(path: String) throws {
