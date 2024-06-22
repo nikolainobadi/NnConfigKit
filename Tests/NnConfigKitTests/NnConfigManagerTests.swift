@@ -27,20 +27,20 @@ final class NnConfigManagerTests: XCTestCase {
 
 // MARK: - Default Config Folder Tests
 extension NnConfigManagerTests {
-    func test_loadConfig_defaultConfigFolder_throwsErrorWhenMissingConfig() {
+    func test_throws_error_when_config_does_not_exist_when_loading() {
         saveConfig(makeConfig(), configType: .customConfig)
         
         XCTAssertThrowsError(try makeSUT(type: .defaultConfig).loadConfig())
     }
     
-    func test_saveConfig_loadConfig_saveUpdated_defaultConfigFolder() throws {
+    func test_saves_config_in_default_folder_and_overwrites_config_when_updating() throws {
         let customConfig = makeConfig()
         let updatedConfig = makeConfig(secondSetting: "newSetting")
         
         try runSaveLoadUpdateTest(for: customConfig, updatedConfig: updatedConfig, configType: .defaultConfig)
     }
     
-    func test_saveNestedConfigFile_deleteNestedConfigFile_defaultConfigFolder() throws {
+    func test_saves_and_deletes_nested_file_in_default_config_folder() throws {
         let nestedFilePath = "NestedFolder/NestedFile"
         let sut = makeSUT(type: .defaultConfig)
         let configFolderPath = sut.configFolderPath
@@ -58,7 +58,7 @@ extension NnConfigManagerTests {
         XCTAssertNil(try? File(path: completeFilePath))
     }
     
-    func test_nestedFileOperations_defaultConfigFolder() throws {
+    func test_performs_all_operations_on_nested_file_in_default_config_folder() throws {
         let newLine = "new line"
         let contents = makeNestedContent()
         let existingLine = sampleTextLines[0]
@@ -92,13 +92,13 @@ extension NnConfigManagerTests {
 
 // MARK: - Custom Folder Tests
 extension NnConfigManagerTests {
-    func test_loadConfig_customConfigFolder_throwsErrorWhenMissingConfig() throws {
+    func test_throws_error_when_config_does_not_exist_in_custom_folder_when_loading() throws {
         saveConfig(makeConfig(), configType: .defaultConfig)
         
         XCTAssertThrowsError(try makeSUT(type: .customConfig).loadConfig())
     }
     
-    func test_saveConfig_customConfigFolder() throws {
+    func test_saves_and_updates_config_in_custom_folder() throws {
         let customConfig = makeConfig()
         let updatedConfig = makeConfig(secondSetting: "newSetting")
         
