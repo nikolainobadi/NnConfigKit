@@ -23,8 +23,7 @@ let package = Package(
         .target(
             name: "NnConfigKit",
             dependencies: [
-                "Files",
-                
+                "Files"
             ]
         ),
         .executableTarget(

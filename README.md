@@ -14,7 +14,7 @@
 To use `NnConfigKit` in your project, you can add it as a dependency in your `Package.swift` file:
 
 ```swift
-// swift-tools-version:5.3
+// swift-tools-version:5.7
 import PackageDescription
 
 let package = Package(
@@ -36,42 +36,48 @@ let package = Package(
 ## Usage
 
 ### Define Your Configuration
-
 First, create a struct that conforms to the `Codable` protocol:
 
 ```swift
-import NnConfigKit
-
 struct MyConfig: Codable {
     // codable properties here
 }
 ```
 
-### Loading Configuration
-
-To load your configuration file, use the `NnConfigManager`:
+### Initialize NnConfigManager
+Create an instance of `NnConfigManager` with your project name and optionally specify the configuration folder path and configuration file name:
 
 ```swift
 import NnConfigKit
 
-let configManager = NnConfigManager<MyConfig>()
+// only passing in projectName will save the config file in .config/NnConfigList/\(projectName) in your home directory
+let configManager = NnConfigManager<MyConfig>(projectName: "MyProject")
+
+// provide configFolderPath and configFileName to customize the location of the config file
+let configFolderPath = "path/to/your/config/folder"
+let configFileName = "myConfig.json"
+let customConfigManager = NnConfigManager<MyConfig>(projectName: "MyProject", configFolderPath: configFolderName, configFileName: configFileName)
+```
+
+### Loading Configuration
+To load your configuration file, use the `NnConfigManager`:
+
+```swift
 do {
     let config = try configManager.loadConfig()
-    print(config)
+    
+    // use config
 } catch {
     print("Failed to load configuration: \(error)")
 }
 ```
 
 ### Saving Configuration
-
 To save your configuration, use the `NnConfigManager`:
 
 ```swift
-import NnConfigKit
-
 let config = MyConfig()
-let configManager = NnConfigManager<MyConfig>()
+
 do {
     try configManager.saveConfig(config)
 } catch {
@@ -80,13 +86,10 @@ do {
 ```
 
 ### Managing Nested Configuration Files
-
 You can also manage nested configuration files using the `NnConfigManager`:
 
 ```swift
 import NnConfigKit
-
-let configManager = NnConfigManager<MyConfig>()
 
 // Save a nested file
 do {
