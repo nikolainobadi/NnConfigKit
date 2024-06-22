@@ -5,9 +5,11 @@
 //  Created by Nikolai Nobadi on 6/19/24.
 //
 
+
 import Files
 import Foundation
 
+/// The default folder path for configuration lists.
 public let DEFAULT_CONFIGLIST_FOLDER_PATH = "\(Folder.home.path).config/NnConfigList"
 
 /// A manager for handling configuration operations such as loading, saving, and managing nested configuration files.
@@ -16,6 +18,11 @@ public struct NnConfigManager<Config: Codable> {
     public let configFolderPath: String
     public let configFileName: String
     
+    /// Initializes a new configuration manager with the specified project name, configuration folder path, and configuration file name.
+    /// - Parameters:
+    ///   - projectName: The name of the project.
+    ///   - configFolderPath: An optional custom path to the configuration folder. Defaults to a standard path based on the project name.
+    ///   - configFileName: An optional custom name for the configuration file. Defaults to the project name.
     public init(projectName: String, configFolderPath: String? = nil, configFileName: String? = nil) {
         self.projectName = projectName
         self.configFolderPath = configFolderPath ?? "\(DEFAULT_CONFIGLIST_FOLDER_PATH)/\(projectName)"
@@ -148,9 +155,9 @@ private extension NnConfigManager {
 
 // MARK: - Extension Dependencies
 extension String {
+    /// Ensures the string ends with the ".json" extension.
     var json: String {
         if self.isEmpty { return "" }
-        
         return self.hasSuffix(".json") ? self : "\(self).json"
     }
 }
