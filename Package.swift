@@ -1,4 +1,4 @@
-// swift-tools-version:5.7
+// swift-tools-version: 6.0
 import PackageDescription
 
 let package = Package(
@@ -14,9 +14,9 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/JohnSundell/Files.git", from: "4.0.0"),
+        .package(url: "https://github.com/JohnSundell/Files.git", from: "4.3.0"),
         .package(url: "https://github.com/kareman/SwiftShell.git", from: "5.1.0"),
-        .package(url: "https://github.com/nikolainobadi/NnTestKit", from: "1.1.0"),
+        .package(url: "https://github.com/nikolainobadi/NnTestKit", from: "1.3.0"),
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.5.0")
     ],
     targets: [

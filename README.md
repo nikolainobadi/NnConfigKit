@@ -1,5 +1,9 @@
 # NnConfigKit
 
+![Swift Version](https://badgen.net/badge/swift/6.0%2B/purple)
+![Platforms](https://img.shields.io/badge/platforms-macOS%2012%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-lightgray)
+
 `NnConfigKit` is a Swift package designed to handle the loading, saving, and managing of configuration files for projects. It leverages the `Files` library to manage file operations and provides a protocol-based approach to ensure that your configuration objects conform to the necessary structure.
 
 ## Features
@@ -14,23 +18,7 @@
 To use `NnConfigKit` in your project, you can add it as a dependency in your `Package.swift` file:
 
 ```swift
-// swift-tools-version:5.7
-import PackageDescription
-
-let package = Package(
-    name: "YourProjectName",
-    dependencies: [
-        .package(url: "https://github.com/nikolainobadi/NnConfigKit.git", branch: "main")
-    ],
-    targets: [
-        .target(
-            name: "YourProjectName",
-            dependencies: ["NnConfigKit"]),
-        .testTarget(
-            name: "YourProjectNameTests",
-            dependencies: ["YourProjectName"]),
-    ]
-)
+    .package(url: "https://github.com/nikolainobadi/NnConfigKit.git", from: "1.0.0")
 ```
 
 ## Usage
