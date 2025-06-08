@@ -18,7 +18,7 @@
 To use `NnConfigKit` in your project, you can add it as a dependency in your `Package.swift` file:
 
 ```swift
-    .package(url: "https://github.com/nikolainobadi/NnConfigKit.git", from: "1.0.0")
+.package(url: "https://github.com/nikolainobadi/NnConfigKit.git", from: "1.0.0")
 ```
 
 ## Usage
