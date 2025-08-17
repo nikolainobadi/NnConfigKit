@@ -5,13 +5,12 @@
 //  Created by Nikolai Nobadi on 5/5/24.
 //
 
-import Files
-import SwiftShell
+import NnShellKit
 import NnConfigKit
 import ArgumentParser
 
 struct ConfigCommand: ParsableCommand {
-    static var configuration = CommandConfiguration(
+    static let configuration = CommandConfiguration(
         abstract: "A utility to create and manage config json files.",
         subcommands: [
             OpenFinder.self
@@ -20,11 +19,12 @@ struct ConfigCommand: ParsableCommand {
 }
 
 struct OpenFinder: ParsableCommand {
-    static var configuration = CommandConfiguration(
+    static let configuration = CommandConfiguration(
         abstract: "Opens the .config folder in Finder"
     )
     
     func run() throws {
-        try runAndPrint(bash: "open -a Finder \(DEFAULT_CONFIGLIST_FOLDER_PATH)")
+        let shell = NnShell()
+        try shell.bash("open -a Finder \(DEFAULT_CONFIGLIST_FOLDER_PATH)")
     }
 }
