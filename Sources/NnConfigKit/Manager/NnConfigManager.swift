@@ -6,11 +6,10 @@
 //
 
 
-import Files
 import Foundation
 
 /// The default folder path for configuration lists.
-public let DEFAULT_CONFIGLIST_FOLDER_PATH = "\(Folder.home.path).config/NnConfigList"
+public let DEFAULT_CONFIGLIST_FOLDER_PATH = "\(NnFolder.home.path)/.config/NnConfigList"
 
 /// A manager for handling configuration operations such as loading, saving, and managing nested configuration files.
 public struct NnConfigManager<Config: Codable> {
@@ -37,7 +36,7 @@ public extension NnConfigManager {
     /// - Throws: An error if the configuration file cannot be read or decoded.
     /// - Returns: The loaded configuration object.
     func loadConfig() throws -> Config {
-        let configFolder = try Folder(path: configFolderPath)
+        let configFolder = try NnFolder(path: configFolderPath)
         let configFile = try configFolder.file(named: configFileName.json)
         let data = try configFile.read()
         let decoder = JSONDecoder()
@@ -64,7 +63,7 @@ public extension NnConfigManager {
     ///   - fileToUpdate: The file to update.
     ///   - asNewLine: Whether to append the text as a new line.
     /// - Throws: An error if the file cannot be read or written.
-    func appendTextToFileIfNeeded(text: String, fileToUpdate: File, asNewLine: Bool) throws {
+    func appendTextToFileIfNeeded(text: String, fileToUpdate: NnFile, asNewLine: Bool) throws {
         let existingContents = try fileToUpdate.readAsString()
         if !existingContents.contains(text) {
             try fileToUpdate.append(asNewLine ? "\n\(text)" : text)
@@ -76,7 +75,7 @@ public extension NnConfigManager {
     ///   - text: The text to be removed.
     ///   - fileToUpdate: The file to update.
     /// - Throws: An error if the file cannot be read or written.
-    func removeTextFromFile(text: String, fileToUpdate: File) throws {
+    func removeTextFromFile(text: String, fileToUpdate: NnFile) throws {
         let existingContents = try fileToUpdate.readAsString()
         var lines = existingContents.components(separatedBy: .newlines)
         lines.removeAll { line in
@@ -105,7 +104,7 @@ public extension NnConfigManager {
     /// - Parameter nestedFilePath: The path to the nested file.
     /// - Throws: An error if the nested file cannot be deleted.
     func deletedNestedConfigFile(nestedFilePath: String) throws {
-        if let nestedFile = try? Folder(path: configFolderPath).file(at: nestedFilePath) {
+        if let nestedFile = try? NnFolder(path: configFolderPath).file(at: nestedFilePath) {
             try nestedFile.delete()
         }
     }
@@ -128,7 +127,7 @@ public extension NnConfigManager {
     ///   - nestedFilePath: The path to the nested file.
     /// - Throws: An error if the nested file cannot be read or written.
     func removeTextFromNestedConfigFile(text: String, nestedFilePath: String) throws {
-        if let nestedFile = try? Folder(path: configFolderPath).file(at: nestedFilePath) {
+        if let nestedFile = try? NnFolder(path: configFolderPath).file(at: nestedFilePath) {
             try removeTextFromFile(text: text, fileToUpdate: nestedFile)
         }
     }
@@ -141,14 +140,12 @@ private extension NnConfigManager {
     /// - Parameter path: The path to the folder.
     /// - Throws: An error if the folder cannot be created.
     /// - Returns: The created or existing folder.
-    func createFolderIfNeeded(path: String) throws -> Folder {
-        if let folder = try? Folder(path: path) {
+    func createFolderIfNeeded(path: String) throws -> NnFolder {
+        if let folder = try? NnFolder(path: path) {
             return folder
         }
         
-        try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true)
-        
-        return try Folder(path: path)
+        return try NnFolder(createPath: path)
     }
 }
 
