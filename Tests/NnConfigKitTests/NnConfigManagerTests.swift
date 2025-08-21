@@ -5,7 +5,6 @@
 //  Created by Nikolai Nobadi on 6/19/24.
 //
 
-import Files
 import XCTest
 import NnTestHelpers
 @testable import NnConfigKit
@@ -47,15 +46,15 @@ extension NnConfigManagerTests {
         let completeFilePath = "\(configFolderPath)/\(nestedFilePath)"
         let contents = makeNestedContent()
         
-        XCTAssertNil(try? File(path: completeFilePath))
+        XCTAssertNil(try? NnFile(path: completeFilePath))
         
         try sut.saveNestedConfigFile(contents: contents, nestedFilePath: nestedFilePath)
         
-        XCTAssertNotNil(try? File(path: completeFilePath))
+        XCTAssertNotNil(try? NnFile(path: completeFilePath))
         
         try sut.deletedNestedConfigFile(nestedFilePath: nestedFilePath)
         
-        XCTAssertNil(try? File(path: completeFilePath))
+        XCTAssertNil(try? NnFile(path: completeFilePath))
     }
     
     func test_performs_all_operations_on_nested_file_in_default_config_folder() throws {
@@ -67,22 +66,22 @@ extension NnConfigManagerTests {
         let configFolderPath = sut.configFolderPath
         let completeFilePath = "\(configFolderPath)/\(nestedFilePath)"
 
-        XCTAssertNil(try? File(path: completeFilePath))
+        XCTAssertNil(try? NnFile(path: completeFilePath))
         
         try sut.saveNestedConfigFile(contents: contents, nestedFilePath: nestedFilePath)
         try sut.appendTextToNestedConfigFileIfNeeded(text: existingLine, nestedFilePath: nestedFilePath, asNewLine: true)
         
-        assertPropertyEquality(try? File(path: completeFilePath).readAsString(), expectedProperty: contents)
+        assertPropertyEquality(try? NnFile(path: completeFilePath).readAsString(), expectedProperty: contents)
         
         try sut.appendTextToNestedConfigFileIfNeeded(text: newLine, nestedFilePath: nestedFilePath, asNewLine: true)
         
-        assertProperty(try? File(path: completeFilePath).readAsString()) { newContents in
+        assertProperty(try? NnFile(path: completeFilePath).readAsString()) { newContents in
             XCTAssert(newContents.contains(newLine))
         }
         
         try sut.removeTextFromNestedConfigFile(text: existingLine, nestedFilePath: nestedFilePath)
         
-        assertProperty(try? File(path: completeFilePath).readAsString()) { newContents in
+        assertProperty(try? NnFile(path: completeFilePath).readAsString()) { newContents in
             XCTAssert(newContents.contains(newLine))
             XCTAssertFalse(newContents.contains(existingLine))
         }
@@ -147,7 +146,7 @@ extension NnConfigManagerTests {
         }
         
         var configFolderPath: String? {
-            return self == .defaultConfig ? nil : "\(Folder.temporary.path).testConfig/NnConfigList/\(projectName)"
+            return self == .defaultConfig ? nil : "\(NnFolder.temporary.path).testConfig/NnConfigList/\(projectName)"
         }
         
         var configFileName: String? {
@@ -199,7 +198,7 @@ private extension NnConfigManagerTests {
     }
     
     func deleteExistingFolder(path: String) throws {
-        if let defaultFolder = try? Folder(path: path) {
+        if let defaultFolder = try? NnFolder(path: path) {
             try defaultFolder.delete()
         }
     }

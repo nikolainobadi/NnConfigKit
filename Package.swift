@@ -14,22 +14,19 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/JohnSundell/Files.git", from: "4.3.0"),
-        .package(url: "https://github.com/kareman/SwiftShell.git", from: "5.1.0"),
         .package(url: "https://github.com/nikolainobadi/NnTestKit", from: "1.3.0"),
+        .package(url: "https://github.com/nikolainobadi/NnShellKit.git", from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.5.0")
     ],
     targets: [
         .target(
             name: "NnConfigKit",
-            dependencies: [
-                "Files"
-            ]
+            dependencies: []
         ),
         .executableTarget(
             name: "NnConfigKitExecutable",
             dependencies: [
-                "SwiftShell",
+                "NnShellKit",
                 "NnConfigKit",
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
             ]
