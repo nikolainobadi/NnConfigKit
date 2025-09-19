@@ -4,21 +4,23 @@
 ![Platforms](https://img.shields.io/badge/platforms-macOS%2012%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-lightgray)
 
-`NnConfigKit` is a Swift package designed to handle the loading, saving, and managing of configuration files for projects. It leverages the `Files` library to manage file operations and provides a protocol-based approach to ensure that your configuration objects conform to the necessary structure.
+`NnConfigKit` is a lightweight Swift package designed to handle the loading, saving, and managing of configuration files for projects. It uses a custom file system implementation with zero external dependencies and provides a generic approach using `Codable` for configuration objects.
 
 ## Features
 
-- Define configuration objects using the `Codable` protocol.
-- Load and save configuration files with ease.
-- Manage nested configuration files.
-- Append or remove text in configuration files.
+- **Zero dependencies** - Lightweight and reliable
+- **Generic design** - Works with any `Codable` configuration type
+- **Pretty-printed JSON** - Human-readable configuration files
+- **Default location** - Automatically manages config files in `~/.config/NnConfigList/{projectName}/`
+- **Nested file support** - Manage additional files within config directories
+- **Custom paths** - Override default locations when needed
 
 ## Installation
 
 To use `NnConfigKit` in your project, you can add it as a dependency in your `Package.swift` file:
 
 ```swift
-.package(url: "https://github.com/nikolainobadi/NnConfigKit.git", from: "1.0.0")
+.package(url: "https://github.com/nikolainobadi/NnConfigKit.git", from: "2.0.0")
 ```
 
 ## Usage
@@ -28,7 +30,15 @@ First, create a struct that conforms to the `Codable` protocol:
 
 ```swift
 struct MyConfig: Codable {
-    // codable properties here
+    let appName: String
+    let version: String
+    let debugMode: Bool
+
+    init(appName: String = "MyApp", version: String = "1.0.0", debugMode: Bool = false) {
+        self.appName = appName
+        self.version = version
+        self.debugMode = debugMode
+    }
 }
 ```
 
@@ -38,13 +48,15 @@ Create an instance of `NnConfigManager` with your project name and optionally sp
 ```swift
 import NnConfigKit
 
-// only passing in projectName will save the config file in .config/NnConfigList/\(projectName) in your home directory
+// Default: saves to ~/.config/NnConfigList/MyProject/config.json
 let configManager = NnConfigManager<MyConfig>(projectName: "MyProject")
 
-// provide configFolderPath and configFileName to customize the location of the config file
-let configFolderPath = "path/to/your/config/folder"
-let configFileName = "myConfig.json"
-let customConfigManager = NnConfigManager<MyConfig>(projectName: "MyProject", configFolderPath: configFolderName, configFileName: configFileName)
+// Custom location and filename
+let customConfigManager = NnConfigManager<MyConfig>(
+    projectName: "MyProject",
+    configFolderPath: "/custom/path/to/config",
+    configFileName: "settings.json"
+)
 ```
 
 ### Loading Configuration
@@ -64,10 +76,11 @@ do {
 To save your configuration, use the `NnConfigManager`:
 
 ```swift
-let config = MyConfig()
+let config = MyConfig(appName: "MyAwesomeApp", version: "2.1.0", debugMode: true)
 
 do {
     try configManager.saveConfig(config)
+    print("Configuration saved successfully!")
 } catch {
     print("Failed to save configuration: \(error)")
 }

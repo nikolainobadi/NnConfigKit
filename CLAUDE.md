@@ -4,25 +4,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-NnConfigKit is a Swift package that provides configuration file management functionality. It consists of two main targets:
+NnConfigKit is a Swift package that provides configuration file management functionality. It is a focused library package that provides:
 
-1. **NnConfigKit** - The core library that provides the `NnConfigManager<Config: Codable>` generic type for managing configuration files
-2. **NnConfigKitExecutable** - A command-line utility built with ArgumentParser for config folder management
+- **NnConfigKit** - The core library that provides the `NnConfigManager<Config: Codable>` generic type for managing configuration files
 
 ## Architecture
 
 ### Core Components
 
-- **NnConfigManager** (`Sources/NnConfigKit/Manager/NnConfigManager.swift`) - Generic configuration manager that handles CRUD operations for JSON configuration files. Uses the Files library for file system operations.
+- **NnConfigManager** (`Sources/NnConfigKit/Manager/NnConfigManager.swift`) - Generic configuration manager that handles CRUD operations for JSON configuration files. Uses custom file system implementation.
 - **JSONEncoder+Extensions** (`Sources/NnConfigKit/Extensions/JSONEncoder+Extensions.swift`) - Provides pretty-printed JSON encoding
-- **ConfigCommand** (`Sources/NnConfigKitExecutable/ConfigCommand.swift`) - ArgumentParser-based CLI with subcommands for config management
+- **File System Components** (`Sources/NnConfigKit/FileSystem/`) - Custom file system implementation with NnFile, NnFolder, and NnFileSystemError
 
 ### Key Dependencies
 
-- **Files** (JohnSundell/Files) - File system operations for the core library
-- **NnShellKit** (nikolainobadi/NnShellKit) - Shell command execution for the executable
-- **ArgumentParser** (apple/swift-argument-parser) - CLI interface
-- **NnTestKit** (nikolainobadi/NnTestKit) - Custom testing utilities
+This package has **zero external dependencies** for maximum simplicity and reliability.
 
 ### Configuration Management
 
@@ -44,13 +40,14 @@ swift build
 swift test
 ```
 
-### Running the Executable
-```bash
-swift run NnConfigKitExecutable [subcommand]
-```
+### Using in Your Project
+```swift
+// Add to Package.swift dependencies
+.package(url: "https://github.com/nikolainobadi/NnConfigKit.git", from: "2.0.0")
 
-Available subcommands:
-- `open-finder` - Opens the .config folder in Finder
+// Import in your Swift files
+import NnConfigKit
+```
 
 ### Testing Specific Components
 ```bash
@@ -77,7 +74,7 @@ let customManager = NnConfigManager<MyConfig>(
 ```
 
 ### Testing Approach
-- Uses `NnTestHelpers` from NnTestKit for assertion utilities
+- Uses standard XCTest framework with no external dependencies
 - Test setup/teardown handles config folder cleanup
 - Uses mock configuration objects that conform to `Codable` and `Equatable`
 - Tests both default and custom configuration folder scenarios
