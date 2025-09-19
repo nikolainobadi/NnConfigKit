@@ -6,7 +6,6 @@
 //
 
 import XCTest
-import NnTestHelpers
 @testable import NnConfigKit
 
 final class NnConfigManagerTests: XCTestCase {
@@ -26,8 +25,8 @@ final class NnConfigManagerTests: XCTestCase {
 
 // MARK: - Default Config Folder Tests
 extension NnConfigManagerTests {
-    func test_throws_error_when_config_does_not_exist_when_loading() {
-        saveConfig(makeConfig(), configType: .customConfig)
+    func test_throws_error_when_config_does_not_exist_when_loading() throws {
+        try saveConfig(makeConfig(), configType: .customConfig)
         
         XCTAssertThrowsError(try makeSUT(type: .defaultConfig).loadConfig())
     }
@@ -71,20 +70,22 @@ extension NnConfigManagerTests {
         try sut.saveNestedConfigFile(contents: contents, nestedFilePath: nestedFilePath)
         try sut.appendTextToNestedConfigFileIfNeeded(text: existingLine, nestedFilePath: nestedFilePath, asNewLine: true)
         
-        assertPropertyEquality(try? NnFile(path: completeFilePath).readAsString(), expectedProperty: contents)
+        let initialContents = try NnFile(path: completeFilePath).readAsString()
+        
+        XCTAssertEqual(initialContents, contents)
         
         try sut.appendTextToNestedConfigFileIfNeeded(text: newLine, nestedFilePath: nestedFilePath, asNewLine: true)
         
-        assertProperty(try? NnFile(path: completeFilePath).readAsString()) { newContents in
-            XCTAssert(newContents.contains(newLine))
-        }
+        let newContents = try NnFile(path: completeFilePath).readAsString()
+        
+        XCTAssert(newContents.contains(newLine))
         
         try sut.removeTextFromNestedConfigFile(text: existingLine, nestedFilePath: nestedFilePath)
         
-        assertProperty(try? NnFile(path: completeFilePath).readAsString()) { newContents in
-            XCTAssert(newContents.contains(newLine))
-            XCTAssertFalse(newContents.contains(existingLine))
-        }
+        let finalContents = try NnFile(path: completeFilePath).readAsString()
+        
+        XCTAssert(finalContents.contains(newLine))
+        XCTAssertFalse(finalContents.contains(existingLine))
     }
 }
 
@@ -92,7 +93,7 @@ extension NnConfigManagerTests {
 // MARK: - Custom Folder Tests
 extension NnConfigManagerTests {
     func test_throws_error_when_config_does_not_exist_in_custom_folder_when_loading() throws {
-        saveConfig(makeConfig(), configType: .defaultConfig)
+        try saveConfig(makeConfig(), configType: .defaultConfig)
         
         XCTAssertThrowsError(try makeSUT(type: .customConfig).loadConfig())
     }
@@ -183,13 +184,9 @@ private extension NnConfigManagerTests {
         return sampleTextLines.joined(separator: "\n")
     }
     
-    func saveConfig(_ config: MockConfig, configType: ConfigType, file: StaticString = #filePath, line: UInt = #line) {
-        let sut = makeSUT(type: configType)
+    func saveConfig(_ config: MockConfig, configType: ConfigType, file: StaticString = #filePath, line: UInt = #line) throws {
         
-        assertNoErrorThrown(
-            action: { try sut.saveConfig(config) },
-            file: file, line: line
-        )
+        try makeSUT(type: configType).saveConfig(config)
     }
     
     func cleanConfigFolders() throws {
