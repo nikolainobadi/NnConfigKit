@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2025-09-19
+
+### BREAKING CHANGES
+- Removed `NnConfigKitExecutable` target and all command-line functionality
+- Eliminated CLI commands including `open-finder` subcommand
+- Package now provides library-only functionality
+
+### Removed
+- NnConfigKitExecutable target and associated source files
+- All external dependencies (NnShellKit, NnTestKit, ArgumentParser)
+- Package.resolved file
+- Command-line interface functionality
+
+### Changed
+- Simplified package structure to library-only target
+- Updated test suite to remove NnTestHelpers dependency
+- Streamlined Package.swift configuration
+
+### Added
+- Project changelog with complete version history
+
 ## [1.1.0] - 2025-08-20
 
 ### Changed
